@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+# Rechaza commits sin ID de tarea válido (SPEC-MASTER §3.3).
+# Activar con: git config core.hooksPath tools/hooks
+
+first_line=$(head -n1 "$1")
+
+if printf '%s' "$first_line" | grep -qE '^\[(TASK-R[0-9]+-[0-9]{3}|SDD)\] .+'; then
+    exit 0
+fi
+if printf '%s' "$first_line" | grep -qE '^(Merge|Revert|fixup!|squash!)'; then
+    exit 0
+fi
+
+cat >&2 <<'EOF'
+Commit rechazado: el mensaje debe empezar por un ID de tarea.
+
+  [TASK-R1-014] Bloqueo temporal tras 5 fallos de login
+  [SDD] Actualiza SPEC-R2 con criterios del lightbox   (solo specs/plan/tasks/docs/tools)
+
+Ver SPEC-MASTER.md §3.3 (trazabilidad bidireccional).
+EOF
+exit 1
