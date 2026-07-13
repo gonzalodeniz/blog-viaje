@@ -32,7 +32,7 @@
 | RNF-R1-04 | WP-R1-1 | — | — | — | — |
 | RNF-R1-05 | WP-R1-1 | — | — | — | — |
 | RNF-R1-06 | WP-R1-1 | — | — | tools/traceability.py | — |
-| RNF-R1-07 | WP-R1-1 | TASK-R1-001 | — | — | — |
+| RNF-R1-07 | WP-R1-1 | TASK-R1-001 | — | backend/app/api/health.py | backend/tests/test_cli.py, backend/tests/test_config.py, backend/tests/test_db.py, backend/tests/test_health.py |
 | RNF-R1-08 | WP-R1-2 | — | — | — | — |
 
 ## R2
