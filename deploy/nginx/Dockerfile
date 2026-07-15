@@ -9,7 +9,7 @@ RUN npm run build
 
 FROM nginx:1.27-alpine
 
-RUN rm -rf /usr/share/nginx/html/*
+RUN rm -rf /usr/share/nginx/html/* /etc/nginx/conf.d/default.conf
 COPY deploy/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY deploy/nginx/conf.d/ /etc/nginx/conf.d/
+COPY deploy/nginx/templates/ /etc/nginx/templates/
 COPY --from=frontend-build /frontend/dist /usr/share/nginx/html

@@ -44,16 +44,38 @@ services:
     build:
       context: ..
       dockerfile: deploy/nginx/Dockerfile
+    environment:
+      BITACORA_DOMAIN: ${BITACORA_DOMAIN}
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot-webroot:/var/www/certbot:ro
     depends_on:
       backend:
         condition: service_healthy
     networks:
       - internal
 
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+    entrypoint: >
+      sh -c 'trap exit TERM;
+      while :; do
+        certbot renew --webroot -w /var/www/certbot --quiet;
+        sleep 12h & wait $${!};
+      done'
+    networks:
+      - internal
+
 volumes:
   pgdata:
+  letsencrypt:
+  certbot-webroot:
 
 networks:
   internal:

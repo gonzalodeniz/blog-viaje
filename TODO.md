@@ -19,7 +19,7 @@ Estado de avance de Bitácora. Fuente de verdad detallada: `specs/`, `plan/`, `t
 
 - [x] `TASK-R1-001`: esqueleto de backend (FastAPI/SQLAlchemy/Alembic/pytest), frontend (Vite/React 18/TS/Vitest) y `docker-compose.yml` (nginx + backend + postgres); `/healthz`; verificado extremo a extremo
 - [x] `TASK-R1-002`: pipeline de CI (`.github/workflows/ci.yml`) — cobertura ≥ 80 % bloqueante en backend/frontend, bandit/semgrep/pip-audit/npm audit/trivy/gitleaks, `traceability.py --check --release R1` (bloqueante; en rojo hasta que el resto de WPs de R1 cierren su trazabilidad)
-- [ ] nginx: TLS (Let's Encrypt/certbot), cabeceras de seguridad (CSP, HSTS, etc. — RNF-R1-03/04), rate limiting de `/api/auth/*`
+- [x] `TASK-R1-003`: TLS (Let's Encrypt/certbot con `deploy/scripts/init-letsencrypt.sh`), cabeceras de seguridad (CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy — RNF-R1-03/04), rate limiting de `/api/auth/*`; verificado con certificado autofirmado (sin dominio real disponible en este entorno)
 - [ ] Imágenes con sistema de archivos de solo lectura donde sea posible (RNF-R1-07)
 
 ### WP-R1-2 — Autenticación, sesiones y bloqueo
