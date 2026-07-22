@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-1
 - **Requisitos:** RNF-R1-07
-- **Estado:** en curso
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-004
 
 ## Objetivo
@@ -23,8 +23,8 @@ Los contenedores `backend` y `nginx` corren con `read_only: true` en `docker-com
 - [x] Test de humo: `docker compose up -d` con `read_only: true` activo → healthchecks de `backend` y `nginx` en verde, `curl -k https://localhost/healthz` devuelve 200
 - [x] Cobertura ≥ 80 % en el código tocado (no aplica: cambio de infraestructura sin código Python/TS; sin regresión en la cobertura existente)
 - [x] Revisión de seguridad (superficie de escritura minimizada a los `tmpfs` estrictamente necesarios; sin secretos ni datos persistentes en los `tmpfs`)
-- [ ] `python tools/traceability.py --check --release R1` en verde — sigue en rojo (ver TASK-R1-002/003): quedan RF/RNF de otros WPs de R1 sin test
-- [ ] Commits con prefijo `[TASK-R1-004]`
+- [ ] `python tools/traceability.py --check --release R1` en verde — sigue en rojo (ver TASK-R1-002/003): quedan RF/RNF de otros WPs de R1 sin test, incluyendo RNF-R1-04 (TASK-R1-003, sin test de spec propio por ser TLS de infraestructura) y RNF-R1-07 (esta tarea, hardening de infraestructura sin test de spec propio); nada de esto es atribuible a TASK-R1-004
+- [x] Commits con prefijo `[TASK-R1-004]`
 
 ## Notas de implementación
 
