@@ -1,0 +1,5 @@
+# Punto de entrada único: permite "docker compose up -d" desde la raíz del
+# repositorio (SPEC-MASTER §13). La definición real vive en deploy/, junto a
+# la configuración de nginx.
+include:
+  - deploy/docker-compose.yml

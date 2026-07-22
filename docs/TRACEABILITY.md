@@ -26,13 +26,13 @@
 | RF-R1-18 | WP-R1-4, WP-R1-5 | — | — | — | — |
 | RF-R1-19 | WP-R1-5 | — | — | — | — |
 | RF-R1-20 | WP-R1-2 | — | — | — | — |
-| RNF-R1-01 | WP-R1-1 | — | — | — | — |
+| RNF-R1-01 | WP-R1-1 | TASK-R1-002 | 9b515b4 | — | tests/meta/test_ci_pipeline.py |
 | RNF-R1-02 | WP-R1-2 | — | — | — | — |
-| RNF-R1-03 | WP-R1-1, WP-R1-2 | — | — | — | — |
-| RNF-R1-04 | WP-R1-1 | — | — | — | — |
-| RNF-R1-05 | WP-R1-1 | — | — | — | — |
-| RNF-R1-06 | WP-R1-1 | — | — | tools/traceability.py | — |
-| RNF-R1-07 | WP-R1-1 | TASK-R1-001 | — | — | — |
+| RNF-R1-03 | WP-R1-1, WP-R1-2 | TASK-R1-003 | d9417e0 | — | — |
+| RNF-R1-04 | WP-R1-1 | TASK-R1-003 | d9417e0 | — | — |
+| RNF-R1-05 | WP-R1-1 | TASK-R1-002 | 9b515b4 | — | tests/meta/test_ci_pipeline.py |
+| RNF-R1-06 | WP-R1-1 | TASK-R1-002 | 9b515b4 | tools/traceability.py | tests/meta/test_ci_pipeline.py |
+| RNF-R1-07 | WP-R1-1 | TASK-R1-001, TASK-R1-002, TASK-R1-004 | 8a4073b, 9b515b4, b8503d2, 311267a | backend/app/api/health.py | backend/tests/test_cli.py, backend/tests/test_config.py, backend/tests/test_db.py, backend/tests/test_health.py |
 | RNF-R1-08 | WP-R1-2 | — | — | — | — |
 
 ## R2
