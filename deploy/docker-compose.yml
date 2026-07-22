@@ -1,3 +1,4 @@
+# Implementa: RNF-R1-07 (usuario no root ya en los Dockerfiles; aquí, FS de solo lectura)
 services:
   postgres:
     image: postgres:16-alpine
@@ -29,6 +30,10 @@ services:
       SESSION_REMEMBER_DAYS: ${SESSION_REMEMBER_DAYS}
       SESSION_ABSOLUTE_MAX_DAYS: ${SESSION_ABSOLUTE_MAX_DAYS}
       LOGIN_ATTEMPTS_RETENTION_DAYS: ${LOGIN_ATTEMPTS_RETENTION_DAYS}
+      PYTHONDONTWRITEBYTECODE: "1"
+    read_only: true
+    tmpfs:
+      - /tmp
     depends_on:
       postgres:
         condition: service_healthy
@@ -46,6 +51,11 @@ services:
       dockerfile: deploy/nginx/Dockerfile
     environment:
       BITACORA_DOMAIN: ${BITACORA_DOMAIN}
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
+      - /tmp
     ports:
       - "80:80"
       - "443:443"
