@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-4
 - **Requisitos:** RF-R1-13, RF-R1-14, RF-R1-01 (aplicado)
-- **Estado:** en curso
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-008
 
 ## Objetivo
@@ -21,12 +21,12 @@ Existen dos endpoints HTTP autenticados: `GET /api/trips` (listado cronológico 
 
 ## Definition of Done
 
-- [ ] Código con docstring `Implementa: RF-R1-13, RF-R1-14` en los módulos afectados
-- [ ] Tests con `@pytest.mark.spec("...")`: listado ordenado, solo publicados, 401 sin sesión (criterio de aceptación exacto de RF-R1-01), artículo con contenido y fotos (públicas y privadas incluidas), 404 en slug inexistente o en borrador
-- [ ] Cobertura ≥ 80 % en el código tocado
-- [ ] Revisión de seguridad: ambos endpoints detrás de `get_current_user`; sin fuga de metadatos de borradores por código de estado
-- [ ] `python tools/traceability.py --check --release R1` — sigue en rojo (quedan otros WPs sin test), no bloquea esta tarea
-- [ ] Commits con prefijo `[TASK-R1-008]`
+- [x] Código con docstring `Implementa: RF-R1-13, RF-R1-14` en los módulos afectados
+- [x] Tests con `@pytest.mark.spec("...")`: listado ordenado, solo publicados, 401 sin sesión (criterio de aceptación exacto de RF-R1-01), artículo con contenido y fotos (públicas y privadas incluidas), 404 en slug inexistente o en borrador — mismo cuerpo/código en ambos casos (10 tests nuevos, 104 en total)
+- [x] Cobertura ≥ 80 % en el código tocado (`app/api/trips.py` al 100 %; 97.93 % total)
+- [x] Revisión de seguridad: ambos endpoints detrás de `get_current_user`; slug de borrador y slug inexistente devuelven el mismo 404 (verificado con test); bandit sin hallazgos
+- [x] `python tools/traceability.py --check --release R1` — sigue en rojo (quedan otros WPs sin test), no bloquea esta tarea
+- [x] Commits con prefijo `[TASK-R1-008]`
 
 ## Notas de implementación
 
