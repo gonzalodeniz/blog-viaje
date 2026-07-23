@@ -84,6 +84,44 @@ def make_trip(db_session: Session, make_topic):
 
 
 @pytest.fixture
+def make_user(db_session: Session):
+    from app.core.security import hash_password
+    from app.models.user import User
+
+    def _make(**kwargs: object) -> User:
+        password = kwargs.pop("password", "una-contraseña-larga-123")
+        defaults = {"username": "gonzalo", "password_hash": hash_password(password)}
+        defaults.update(kwargs)
+        user = User(**defaults)
+        db_session.add(user)
+        db_session.flush()
+        return user
+
+    return _make
+
+
+@pytest.fixture
+def client(db_session: Session):
+    from fastapi.testclient import TestClient
+
+    from app.db.session import get_db
+    from app.main import app
+
+    def _override_get_db():
+        yield db_session
+
+    app.dependency_overrides[get_db] = _override_get_db
+    try:
+        # base_url en https: las cookies de sesión/CSRF se emiten con
+        # Secure=True (RF-R1-02) y el cliente de test descartaría esas
+        # cookies de su jar entre peticiones si el esquema fuera http.
+        with TestClient(app, base_url="https://testserver") as test_client:
+            yield test_client
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.fixture
 def make_photo(db_session: Session, make_trip, make_topic):
     from app.models.photo import Photo
 
