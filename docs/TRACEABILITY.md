@@ -18,17 +18,17 @@
 | RF-R1-10 | WP-R1-3 | — | — | — | — |
 | RF-R1-11 | WP-R1-3 | — | — | — | — |
 | RF-R1-12 | WP-R1-3 | — | — | — | — |
-| RF-R1-13 | WP-R1-4, WP-R1-6 | TASK-R1-005 | 7563c2f | backend/app/models/trip.py, backend/tests/test_models.py | backend/tests/test_models.py |
-| RF-R1-14 | WP-R1-4, WP-R1-6 | TASK-R1-005 | 7563c2f | backend/app/models/photo.py, backend/app/models/trip.py, backend/tests/test_models.py | backend/tests/test_models.py |
-| RF-R1-15 | WP-R1-4, WP-R1-5 | TASK-R1-005 | 7563c2f | backend/app/models/audit_log.py, backend/app/models/photo.py, backend/app/models/tag.py, backend/app/models/trip.py, backend/tests/test_models.py | backend/tests/test_models.py |
-| RF-R1-16 | WP-R1-4, WP-R1-5 | TASK-R1-005 | 7563c2f | backend/app/models/audit_log.py, backend/app/models/topic.py, backend/tests/test_models.py | backend/tests/test_models.py |
-| RF-R1-17 | WP-R1-5 | — | — | — | — |
-| RF-R1-18 | WP-R1-4, WP-R1-5 | TASK-R1-005 | 7563c2f | backend/app/models/trip.py, backend/tests/test_models.py | — |
+| RF-R1-13 | WP-R1-4, WP-R1-6 | TASK-R1-005 | e1e3299, 7563c2f | backend/app/models/trip.py, backend/tests/test_models.py | backend/tests/test_models.py |
+| RF-R1-14 | WP-R1-4, WP-R1-6 | TASK-R1-005 | e1e3299, 7563c2f | backend/app/models/photo.py, backend/app/models/trip.py, backend/tests/test_models.py | backend/tests/test_models.py |
+| RF-R1-15 | WP-R1-4, WP-R1-5 | TASK-R1-005 | e1e3299, 7563c2f | backend/app/models/audit_log.py, backend/app/models/photo.py, backend/app/models/tag.py, backend/app/models/trip.py, backend/tests/test_models.py | backend/tests/test_models.py |
+| RF-R1-16 | WP-R1-4, WP-R1-5 | TASK-R1-005 | e1e3299, 7563c2f | backend/app/models/audit_log.py, backend/app/models/topic.py, backend/tests/test_models.py | backend/tests/test_models.py |
+| RF-R1-17 | WP-R1-5 | TASK-R1-006 | 00d86fc | — | — |
+| RF-R1-18 | WP-R1-4, WP-R1-5 | TASK-R1-005, TASK-R1-006 | e1e3299, 7563c2f, 00d86fc | backend/app/models/trip.py, backend/app/services/html_sanitizer.py, backend/tests/test_html_sanitizer.py, backend/tests/test_models.py | backend/tests/test_html_sanitizer.py |
 | RF-R1-19 | WP-R1-5 | — | — | — | — |
 | RF-R1-20 | WP-R1-2 | — | — | — | — |
 | RNF-R1-01 | WP-R1-1 | TASK-R1-002 | 9b515b4 | — | tests/meta/test_ci_pipeline.py |
 | RNF-R1-02 | WP-R1-2 | — | — | — | — |
-| RNF-R1-03 | WP-R1-1, WP-R1-2 | TASK-R1-003 | d9417e0 | — | — |
+| RNF-R1-03 | WP-R1-1, WP-R1-2 | TASK-R1-003, TASK-R1-006 | d9417e0, 00d86fc | — | — |
 | RNF-R1-04 | WP-R1-1 | TASK-R1-003, TASK-R1-004 | d9417e0, 49c9646, b8503d2, 311267a | — | — |
 | RNF-R1-05 | WP-R1-1 | TASK-R1-002 | 9b515b4 | — | tests/meta/test_ci_pipeline.py |
 | RNF-R1-06 | WP-R1-1 | TASK-R1-002 | 9b515b4 | tools/traceability.py | tests/meta/test_ci_pipeline.py |
