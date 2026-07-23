@@ -11,19 +11,19 @@
 | RF-R1-03 | WP-R1-2 | TASK-R1-007 | 1e30691, a3cb88a | — | — |
 | RF-R1-04 | WP-R1-2 | TASK-R1-007 | 1e30691, a3cb88a | backend/app/api/auth.py, backend/app/services/auth.py, backend/tests/test_api_auth.py, backend/tests/test_auth_service.py | backend/tests/test_api_auth.py, backend/tests/test_auth_service.py |
 | RF-R1-05 | WP-R1-2, WP-R1-5 | TASK-R1-007 | 1e30691, a3cb88a | — | — |
-| RF-R1-06 | WP-R1-2, WP-R1-5 | TASK-R1-007, TASK-R1-009 | 1e30691, a3cb88a, 388a392 | — | — |
+| RF-R1-06 | WP-R1-2, WP-R1-5 | TASK-R1-007, TASK-R1-009 | 1e30691, a3cb88a, 361a3c7, 388a392 | — | — |
 | RF-R1-07 | WP-R1-2 | TASK-R1-007, TASK-R1-008 | 1e30691, a3cb88a, b94ca9b, 635a4bd | — | — |
 | RF-R1-08 | WP-R1-3 | — | — | — | — |
 | RF-R1-09 | WP-R1-3 | — | — | — | — |
 | RF-R1-10 | WP-R1-3 | TASK-R1-007 | 1e30691, a3cb88a | — | — |
 | RF-R1-11 | WP-R1-3 | — | — | — | — |
-| RF-R1-12 | WP-R1-3 | TASK-R1-009 | 388a392 | — | — |
+| RF-R1-12 | WP-R1-3 | TASK-R1-009 | 361a3c7, 388a392 | — | — |
 | RF-R1-13 | WP-R1-4, WP-R1-6 | TASK-R1-005, TASK-R1-008 | e1e3299, 7563c2f, b94ca9b, 635a4bd | backend/app/api/trips.py, backend/app/models/trip.py, backend/tests/test_api_trips.py, backend/tests/test_models.py | backend/tests/test_api_trips.py, backend/tests/test_models.py |
-| RF-R1-14 | WP-R1-4, WP-R1-6 | TASK-R1-005, TASK-R1-008 | e1e3299, 7563c2f, b94ca9b, 635a4bd | backend/app/api/trips.py, backend/app/models/photo.py, backend/app/models/trip.py, backend/tests/test_api_trips.py, backend/tests/test_models.py | backend/tests/test_api_trips.py, backend/tests/test_models.py |
-| RF-R1-15 | WP-R1-4, WP-R1-5 | TASK-R1-005, TASK-R1-008, TASK-R1-009 | e1e3299, 7563c2f, b94ca9b, 635a4bd, 388a392 | backend/app/api/admin_trips.py, backend/app/models/audit_log.py, backend/app/models/photo.py, backend/app/models/tag.py, backend/app/models/trip.py, backend/tests/test_api_admin_trips.py, backend/tests/test_models.py | backend/tests/test_api_admin_trips.py, backend/tests/test_models.py |
-| RF-R1-16 | WP-R1-4, WP-R1-5 | TASK-R1-005, TASK-R1-009 | e1e3299, 7563c2f, 388a392 | backend/app/api/admin_topics.py, backend/app/models/audit_log.py, backend/app/models/topic.py, backend/tests/test_api_admin_topics.py, backend/tests/test_models.py | backend/tests/test_api_admin_topics.py, backend/tests/test_models.py |
+| RF-R1-14 | WP-R1-4, WP-R1-6 | TASK-R1-005, TASK-R1-008, TASK-R1-010 | e1e3299, 7563c2f, b94ca9b, 635a4bd, 586befc | backend/app/api/admin_photos.py, backend/app/api/photos.py, backend/app/api/trips.py, backend/app/models/photo.py, backend/app/models/trip.py, backend/app/services/photo_storage.py, backend/tests/test_api_admin_photos.py, backend/tests/test_api_photos.py, backend/tests/test_api_trips.py, backend/tests/test_models.py, backend/tests/test_photo_storage.py | backend/tests/test_api_admin_photos.py, backend/tests/test_api_photos.py, backend/tests/test_api_trips.py, backend/tests/test_models.py |
+| RF-R1-15 | WP-R1-4, WP-R1-5 | TASK-R1-005, TASK-R1-008, TASK-R1-009, TASK-R1-010 | e1e3299, 7563c2f, b94ca9b, 635a4bd, 361a3c7, 388a392, 586befc | backend/app/api/admin_photos.py, backend/app/api/admin_trips.py, backend/app/models/audit_log.py, backend/app/models/photo.py, backend/app/models/tag.py, backend/app/models/trip.py, backend/app/services/photo_storage.py, backend/tests/test_api_admin_photos.py, backend/tests/test_api_admin_trips.py, backend/tests/test_models.py, backend/tests/test_photo_storage.py | backend/tests/test_api_admin_photos.py, backend/tests/test_api_admin_trips.py, backend/tests/test_models.py, backend/tests/test_photo_storage.py |
+| RF-R1-16 | WP-R1-4, WP-R1-5 | TASK-R1-005, TASK-R1-009 | e1e3299, 7563c2f, 361a3c7, 388a392 | backend/app/api/admin_topics.py, backend/app/models/audit_log.py, backend/app/models/topic.py, backend/tests/test_api_admin_topics.py, backend/tests/test_models.py | backend/tests/test_api_admin_topics.py, backend/tests/test_models.py |
 | RF-R1-17 | WP-R1-5 | TASK-R1-006 | ff36b54, 00d86fc | — | — |
-| RF-R1-18 | WP-R1-4, WP-R1-5 | TASK-R1-005, TASK-R1-006, TASK-R1-009 | e1e3299, 7563c2f, ff36b54, 00d86fc, 388a392 | backend/app/api/admin_trips.py, backend/app/models/trip.py, backend/app/services/html_sanitizer.py, backend/tests/test_api_admin_trips.py, backend/tests/test_html_sanitizer.py, backend/tests/test_models.py | backend/tests/test_api_admin_trips.py, backend/tests/test_html_sanitizer.py |
+| RF-R1-18 | WP-R1-4, WP-R1-5 | TASK-R1-005, TASK-R1-006, TASK-R1-009 | e1e3299, 7563c2f, ff36b54, 00d86fc, 361a3c7, 388a392 | backend/app/api/admin_trips.py, backend/app/models/trip.py, backend/app/services/html_sanitizer.py, backend/tests/test_api_admin_trips.py, backend/tests/test_html_sanitizer.py, backend/tests/test_models.py | backend/tests/test_api_admin_trips.py, backend/tests/test_html_sanitizer.py |
 | RF-R1-19 | WP-R1-5 | — | — | — | — |
 | RF-R1-20 | WP-R1-2 | TASK-R1-007 | 1e30691, a3cb88a | — | — |
 | RNF-R1-01 | WP-R1-1 | TASK-R1-002 | 9b515b4 | — | tests/meta/test_ci_pipeline.py |
@@ -48,14 +48,14 @@
 | RF-R2-07 | — | — | — | — | — |
 | RF-R2-08 | — | — | — | — | — |
 | RF-R2-09 | — | — | — | — | — |
-| RF-R2-10 | — | — | — | — | — |
-| RF-R2-11 | — | — | — | — | — |
-| RF-R2-12 | — | — | — | — | — |
-| RF-R2-13 | — | — | — | — | — |
-| RF-R2-14 | — | — | — | — | — |
+| RF-R2-10 | — | TASK-R1-010 | 586befc | — | — |
+| RF-R2-11 | — | TASK-R1-010 | 586befc | — | — |
+| RF-R2-12 | — | TASK-R1-010 | 586befc | — | — |
+| RF-R2-13 | — | TASK-R1-010 | 586befc | — | — |
+| RF-R2-14 | — | TASK-R1-010 | 586befc | — | — |
 | RF-R2-15 | — | — | — | — | — |
 | RNF-R2-01 | — | — | — | — | — |
-| RNF-R2-02 | — | TASK-R1-008 | b94ca9b, 635a4bd | — | — |
+| RNF-R2-02 | — | TASK-R1-008, TASK-R1-010 | b94ca9b, 635a4bd, 586befc | — | — |
 
 ## R3
 

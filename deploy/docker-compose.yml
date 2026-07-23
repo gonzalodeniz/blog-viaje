@@ -30,10 +30,13 @@ services:
       SESSION_REMEMBER_DAYS: ${SESSION_REMEMBER_DAYS}
       SESSION_ABSOLUTE_MAX_DAYS: ${SESSION_ABSOLUTE_MAX_DAYS}
       LOGIN_ATTEMPTS_RETENTION_DAYS: ${LOGIN_ATTEMPTS_RETENTION_DAYS}
+      MEDIA_ROOT: /app/media
       PYTHONDONTWRITEBYTECODE: "1"
     read_only: true
     tmpfs:
       - /tmp
+    volumes:
+      - media:/app/media
     depends_on:
       postgres:
         condition: service_healthy
@@ -85,6 +88,7 @@ services:
 
 volumes:
   pgdata:
+  media:
   letsencrypt:
   certbot-webroot:
 

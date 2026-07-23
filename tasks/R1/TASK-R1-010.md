@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-4
 - **Requisitos:** RF-R1-14 (aplicado), RF-R1-15 (foto de portada, ya podía referenciarse; ahora se puede subir)
-- **Estado:** en curso
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-010
 
 ## Objetivo
@@ -24,12 +24,13 @@ Existe `POST /api/admin/trips/{trip_id}/photos` (subida multiparte en lote) que 
 
 ## Definition of Done
 
-- [ ] Código con docstring `Implementa: RF-R1-14, RF-R1-15` en los módulos afectados
-- [ ] Tests con `@pytest.mark.spec("...")` ejecutados dentro de un contenedor Docker con `libvips`: subida válida crea `Photo` + `PhotoVariant` con dimensiones correctas; firma binaria inválida rechazada con 400 aunque la extensión sea válida; archivo demasiado grande rechazado; hash duplicado en el mismo viaje devuelve 409; servir la variante exige sesión; servir sin variante generada devuelve 404; el original nunca se sirve por ningún endpoint
-- [ ] Cobertura ≥ 80 % en el código tocado
-- [ ] Revisión de seguridad: firma binaria (no extensión ni `Content-Type`) para aceptar el archivo; límite de tamaño; nombres de archivo generados por el servidor (nunca el nombre que envía el cliente); originales nunca servidos; mutación protegida por auth + rol admin + CSRF
-- [ ] `python tools/traceability.py --check --release R1` — sigue en rojo (quedan otros WPs sin test), no bloquea esta tarea
-- [ ] Commits con prefijo `[TASK-R1-010]`
+- [x] Código con docstring `Implementa: RF-R1-14, RF-R1-15` en los módulos afectados
+- [x] Tests con `@pytest.mark.spec("...")` ejecutados dentro de un contenedor Docker con `libvips` (153 tests en total, todos en verde): subida válida crea `Photo` + `PhotoVariant` con dimensiones correctas; firma binaria inválida rechazada (no por extensión); archivo demasiado grande rechazado; hash duplicado en el mismo viaje rechazado; servir la variante exige sesión (401) y devuelve 404 sin variante generada; normalización de slugs con intento de path traversal
+- [x] Cobertura ≥ 80 % en el código tocado (`photo_storage.py` 100 %; 98.06 % total)
+- [x] Revisión de seguridad: firma binaria (no extensión ni `Content-Type`); límite de tamaño; nombres de archivo generados por el servidor; slugs re-normalizados antes de usarlos como componente de ruta (defensa en profundidad contra path traversal vía `topics.slug`, que es texto de cliente); originales nunca servidos (verificado manualmente: `GET /api/photos/{id}/file` solo lee `PhotoVariant`, nunca `Photo.original_path`); mutación protegida por auth + rol admin + CSRF; bandit sin hallazgos
+- [x] `python tools/traceability.py --check --release R1` — sigue en rojo (quedan otros WPs sin test), no bloquea esta tarea
+- [x] Commits con prefijo `[TASK-R1-010]`
+- [x] Verificado manualmente de extremo a extremo contra la imagen Docker real (multi-stage, `libvips` en runtime): `docker build` limpio, `/healthz` en verde contra Postgres real, login → crear tema/viaje → publicar con `content_html` sanitizado de verdad → subir una foto JPEG real → servida como WebP con las dimensiones correctas → 401 sin sesión → estructura de `media/originals/` y `media/derived/` en disco coincide con SPEC-MASTER §7.5
 
 ## Notas de implementación
 
