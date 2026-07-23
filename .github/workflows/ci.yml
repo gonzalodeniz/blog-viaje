@@ -16,6 +16,28 @@ jobs:
   backend:
     name: Backend — tests, cobertura y seguridad
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: bitacora
+          POSTGRES_USER: bitacora
+          POSTGRES_PASSWORD: bitacora
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U bitacora -d bitacora"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Los tests de modelos (TASK-R1-005) ejercitan constraints/cascades
+      # contra PostgreSQL real, no un mock: apuntan al servicio de arriba.
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: bitacora
+      POSTGRES_USER: bitacora
+      POSTGRES_PASSWORD: bitacora
     steps:
       - uses: actions/checkout@v4
 
