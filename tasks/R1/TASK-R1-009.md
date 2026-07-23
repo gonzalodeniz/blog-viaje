@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-4
 - **Requisitos:** RF-R1-15, RF-R1-16, RF-R1-18 (aplicado)
-- **Estado:** en curso
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-009
 
 ## Objetivo
@@ -23,12 +23,12 @@ Existen los endpoints CRUD de `/api/admin/topics` y `/api/admin/trips` (crear, l
 
 ## Definition of Done
 
-- [ ] Código con docstring `Implementa: RF-R1-15, RF-R1-16, RF-R1-18` en los módulos afectados
-- [ ] Tests con `@pytest.mark.spec("...")`: CRUD completo de temas y viajes; 401 sin sesión y 403 sin rol admin y sin CSRF; borrar tema referenciado devuelve 409; actualizar `content_json` sanitiza y rellena `content_html`; publicar/despublicar; slugs autogenerados y sin colisión
-- [ ] Cobertura ≥ 80 % en el código tocado
-- [ ] Revisión de seguridad: mutaciones detrás de auth + rol admin + CSRF; sin SQL crudo; `content_html` nunca se acepta directamente del cliente (siempre se deriva de `content_json` sanitizado)
-- [ ] `python tools/traceability.py --check --release R1` — sigue en rojo (quedan otros WPs sin test), no bloquea esta tarea
-- [ ] Commits con prefijo `[TASK-R1-009]`
+- [x] Código con docstring `Implementa: RF-R1-15, RF-R1-16, RF-R1-18` en los módulos afectados
+- [x] Tests con `@pytest.mark.spec("...")`: CRUD completo de temas y viajes; 401 sin sesión y 403 sin rol admin y sin CSRF; borrar tema referenciado devuelve 409; actualizar `content_json` sanitiza y rellena `content_html`; publicar/despublicar; slugs autogenerados y sin colisión (30 tests nuevos, 134 en total)
+- [x] Cobertura ≥ 80 % en el código tocado (`admin_topics.py` 100 %, `admin_trips.py` 99 %; 98.36 % total)
+- [x] Revisión de seguridad: mutaciones detrás de auth + rol admin + CSRF; sin SQL crudo; `content_html` nunca se acepta directamente del cliente (siempre se deriva de `content_json` sanitizado vía `render_content_html`); bandit sin hallazgos
+- [x] `python tools/traceability.py --check --release R1` — sigue en rojo (quedan otros WPs sin test), no bloquea esta tarea
+- [x] Commits con prefijo `[TASK-R1-009]`
 
 ## Notas de implementación
 
