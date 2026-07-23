@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-4
 - **Requisitos:** RF-R1-18
-- **Estado:** en curso
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-006
 
 ## Objetivo
