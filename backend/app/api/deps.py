@@ -33,3 +33,9 @@ def require_csrf(request: Request) -> None:
     header_value = request.headers.get(CSRF_HEADER_NAME)
     if not csrf_token_matches(cookie_value, header_value):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Token CSRF inválido")
+
+
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Requiere rol admin")
+    return current_user

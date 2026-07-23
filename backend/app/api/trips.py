@@ -42,6 +42,7 @@ class PhotoSummary(BaseModel):
     width: int
     height: int
     taken_at: datetime | None
+    url: str
 
 
 class TripDetail(TripListItem):
@@ -117,6 +118,7 @@ def get_trip(
                 width=photo.width,
                 height=photo.height,
                 taken_at=photo.taken_at,
+                url=f"/api/photos/{photo.id}/file",
             )
             for photo in photos
         ],

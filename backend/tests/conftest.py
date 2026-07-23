@@ -101,16 +101,22 @@ def make_user(db_session: Session):
 
 
 @pytest.fixture
-def client(db_session: Session):
+def client(db_session: Session, tmp_path):
     from fastapi.testclient import TestClient
 
+    from app.core.config import get_settings
     from app.db.session import get_db
     from app.main import app
 
     def _override_get_db():
         yield db_session
 
+    # media_root aislado por test: las subidas de fotos (TASK-R1-010) no
+    # deben escribir en el media/ real del checkout.
+    test_settings = get_settings().model_copy(update={"media_root": str(tmp_path / "media")})
+
     app.dependency_overrides[get_db] = _override_get_db
+    app.dependency_overrides[get_settings] = lambda: test_settings
     try:
         # base_url en https: las cookies de sesión/CSRF se emiten con
         # Secure=True (RF-R1-02) y el cliente de test descartaría esas

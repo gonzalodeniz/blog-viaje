@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     session_absolute_max_days: int = 90
     login_attempts_retention_days: int = 90
 
+    # RF-R1-14/15: raíz del volumen de medios (media/originals, media/derived).
+    media_root: str = "media"
+    photo_max_upload_bytes: int = 25 * 1024 * 1024
+
     @property
     def database_url(self) -> str:
         return (
