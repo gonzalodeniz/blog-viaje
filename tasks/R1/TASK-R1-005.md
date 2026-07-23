@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-4
 - **Requisitos:** RF-R1-13, RF-R1-14, RF-R1-15, RF-R1-16, RF-R1-18
-- **Estado:** pendiente
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-005
 
 ## Objetivo
@@ -20,14 +20,15 @@ Existen los modelos SQLAlchemy y la migración Alembic de `topics`, `trips`, `ta
 
 ## Definition of Done
 
-- [ ] Código con docstring `Implementa: RF-R1-13, RF-R1-14, RF-R1-15, RF-R1-16, RF-R1-18` en los modelos SQLAlchemy afectados
-- [ ] Tests con `@pytest.mark.spec("...")` que verifiquen constraints clave (UNIQUE de slugs, `UNIQUE(trip_id, content_hash)` en fotos, cascade/restrict de FKs) contra PostgreSQL real (igual que `backend/tests/test_db.py`)
-- [ ] Cobertura ≥ 80 % en el código tocado
-- [ ] Revisión de seguridad (sin SQL crudo interpolado; `content_html` nunca se rellena en esta tarea, evitando cualquier tentación de saltarse la sanitización; sin datos sensibles en `audit_log.detail`)
-- [ ] `python tools/traceability.py --check --release R1` — seguirá en rojo (quedan endpoints y otros WPs sin test), no bloquea esta tarea
-- [ ] Commits con prefijo `[TASK-R1-005]`
+- [x] Código con docstring `Implementa: RF-R1-13, RF-R1-14, RF-R1-15, RF-R1-16, RF-R1-18` en los modelos SQLAlchemy afectados
+- [x] Tests con `@pytest.mark.spec("...")` que verifiquen constraints clave (UNIQUE de slugs, `UNIQUE(trip_id, content_hash)` en fotos, cascade/restrict de FKs) contra PostgreSQL real (`backend/tests/test_models.py` + `backend/tests/conftest.py`, que aplican la migración de Alembic y aíslan cada test por SAVEPOINT); requirió añadir un servicio `postgres` al job `backend` de CI, que antes no tenía base de datos real
+- [x] Cobertura ≥ 80 % en el código tocado (98.82 % en `app/models/*`)
+- [x] Revisión de seguridad (sin SQL crudo interpolado; `content_html` nunca se rellena en esta tarea; sin datos sensibles en `audit_log.detail`; bandit sin hallazgos)
+- [x] `python tools/traceability.py --check --release R1` — sigue en rojo (quedan endpoints y otros WPs sin test), no bloquea esta tarea
+- [x] Commits con prefijo `[TASK-R1-005]`
 
 ## Notas de implementación
 
 - `backend/app/models/`: nuevos módulos `topic.py`, `trip.py`, `tag.py`, `photo.py`, `audit_log.py`, importados desde `app/models/__init__.py` para que Alembic los detecte vía `app.db.base.Base.metadata`.
 - `backend/alembic/versions/`: una migración (o dos si el ciclo `trips.cover_photo_id` ↔ `photos.trip_id` lo exige) generada con `alembic revision --autogenerate` y revisada a mano.
+- **Bug detectado al escribir los tests:** `use_alter=True` en la `ForeignKeyConstraint` de `cover_photo_id` dentro de `create_table('trips', ...)` solo le indica a SQLAlchemy que la omita del `CREATE TABLE`; no emite el `ALTER TABLE` diferido dentro de una migración de Alembic. La FK nunca se creaba (confirmado contra Postgres real vía `pg_constraint`). Corregido añadiendo `op.create_foreign_key(...)` explícito tras crear `photos`, con su `drop_constraint` simétrico en `downgrade()`.
