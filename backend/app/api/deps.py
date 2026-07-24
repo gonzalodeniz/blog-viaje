@@ -1,4 +1,4 @@
-"""Implementa: RF-R1-01, RNF-R1-03.
+"""Implementa: RF-R1-01, RF-R1-07, RNF-R1-03.
 
 Dependencias de FastAPI compartidas: usuario autenticado a partir de la
 cookie de sesión, y verificación CSRF para mutaciones que dependen de ella.

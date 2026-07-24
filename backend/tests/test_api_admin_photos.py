@@ -29,6 +29,7 @@ def test_subir_foto_sin_sesion_devuelve_401(client, make_trip) -> None:
 
 
 @pytest.mark.spec("RF-R1-15")
+@pytest.mark.spec("RF-R1-07")
 def test_subir_foto_sin_rol_admin_devuelve_403(client, make_user, make_trip) -> None:
     csrf = _login(client, make_user, role="lector")
     trip = make_trip()
