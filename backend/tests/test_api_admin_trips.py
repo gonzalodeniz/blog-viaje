@@ -19,6 +19,7 @@ def test_crear_viaje_sin_sesion_devuelve_401(client, make_topic) -> None:
 
 
 @pytest.mark.spec("RF-R1-15")
+@pytest.mark.spec("RF-R1-07")
 def test_crear_viaje_sin_rol_admin_devuelve_403(client, make_user, make_topic) -> None:
     csrf = _login(client, make_user, role="lector")
     topic = make_topic()

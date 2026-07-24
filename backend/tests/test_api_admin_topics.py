@@ -18,6 +18,7 @@ def test_crear_tema_sin_sesion_devuelve_401(client) -> None:
 
 
 @pytest.mark.spec("RF-R1-16")
+@pytest.mark.spec("RF-R1-07")
 def test_crear_tema_sin_rol_admin_devuelve_403(client, make_user) -> None:
     csrf = _login(client, make_user, role="lector")
 
