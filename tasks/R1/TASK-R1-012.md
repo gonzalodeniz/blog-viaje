@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-2
 - **Requisitos:** RF-R1-03, RF-R1-04, RF-R1-05
-- **Estado:** pendiente <!-- pendiente | en curso | cerrada -->
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-012
 
 ## Objetivo
@@ -17,14 +17,17 @@
 - **RF-R1-04 completo:** el mensaje de bloqueo sigue siendo genérico en cuanto a "por qué" (no dice si el usuario existe), pero **sí** puede incluir el tiempo restante (`locked_until`), porque eso no revela nada sobre la existencia de la cuenta — cualquier `username_claimed`, exista o no, puede acumular intentos y bloquearse igual (los intentos se cuentan por username declarado, no por usuario real).
 - **Reinicio del contador:** un login correcto pone `consecutive_locks` a 0 (se borra la fila de `account_locks`, igual que hace `unlock`); la ventana de 15 min expira sola por `locked_until`.
 - **Rate limiting de nginx por IP** (mencionado en SPEC-MASTER §8 como defensa complementaria) ya está cubierto por TASK-R1-003 (WP-R1-1) — no se toca aquí.
-- **Fuera de alcance:** vista de panel para consultar `login_attempts`/intentos (WP-R1-5), purga automática de `login_attempts` por retención (RNF-R1-08, TASK-R1-015 — necesita el worker).
+- **Fuera de alcance:** vista de panel para consultar `login_attempts`/intentos (WP-R1-5), purga automática de `login_attempts` por retención (RNF-R1-08, TASK-R1-016 — necesita el worker).
+- **`login_attempts.result` es un enum de 3 valores (`success`/`failure`/`locked`), no un booleano `succeeded`** como se anticipaba al formalizar la tarea: RF-R1-05 pide distinguir explícitamente "éxito, fallo, bloqueo", y un booleano no puede representar el tercer estado.
+- **El contador de fallos consecutivos se cuenta directamente sobre `login_attempts`** (no sobre un campo aparte), filtrando por ventana de 15 min y, si hubo un éxito previo, estrictamente posterior a él — tal y como describe SPEC-MASTER §8 ("el contador se evalúa sobre login_attempts").
+- **Bug real encontrado al verificar de extremo a extremo con la sesión de BD real (no la fixture de test):** `authenticate()` solo hacía `flush()` al registrar el intento fallido y actualizar `account_locks`; el endpoint de login lanza `HTTPException(401)` justo después, que FastAPI propaga a través de la dependencia `get_db` — cuyo `except Exception: db.rollback()` deshacía ambos cambios. En producción, **el bloqueo nunca habría llegado a activarse**: cada intento fallido se registraba y se revertía en la misma petición. Corregido con un `db.commit()` explícito en las ramas de fallo/bloqueo de `authenticate()` (el registro de auditoría debe sobrevivir a la petición que falla), cubierto con un test de regresión que usa `SessionLocal`/`TestClient` reales, sin overrides.
 
 ## Definition of Done
 
-- [ ] Código con docstring `Implementa: RF-R1-03, RF-R1-04, RF-R1-05` en los módulos que materializan los requisitos
-- [ ] Migración Alembic para `login_attempts`
-- [ ] Tests con `@pytest.mark.spec("...")`: backoff exponencial (15→30→60, tope), reinicio de contador con login correcto, expiración de ventana de 15 min, mensaje de bloqueo sin revelar existencia de usuario, registro de éxito/fallo/bloqueo en `login_attempts` con IP y user-agent — contra PostgreSQL real
-- [ ] Cobertura ≥ 80 % en el código tocado
-- [ ] Revisión de seguridad (checklist OWASP; verificar que el mensaje de bloqueo no introduce una fuga de timing ni de existencia de usuario)
-- [ ] `python tools/traceability.py --check` en verde
-- [ ] Commits con prefijo `[TASK-R1-012]`
+- [x] Código con docstring `Implementa: RF-R1-03, RF-R1-04, RF-R1-05` en los módulos que materializan los requisitos
+- [x] Migración Alembic para `login_attempts`
+- [x] Tests con `@pytest.mark.spec("...")`: backoff exponencial (15→30→60, tope), reinicio de contador con login correcto, expiración de ventana de 15 min, mensaje de bloqueo sin revelar existencia de usuario, registro de éxito/fallo/bloqueo en `login_attempts` con IP y user-agent, regresión de la sesión real — contra PostgreSQL real (180 tests en total, todos en verde)
+- [x] Cobertura ≥ 80 % en el código tocado (`app/services/auth.py` 98 %; suite completa 98.68 %)
+- [x] Revisión de seguridad: `bandit` sin hallazgos; verificado que el mensaje de bloqueo no revela existencia de usuario (mismo 401 genérico salvo el tiempo restante) ni reintroduce fuga de timing (la comprobación de `account_locks` ocurre antes de saber si el usuario existe, para ambas ramas)
+- [x] `python tools/traceability.py --check` en verde para RF-R1-03/04/05 específicamente (el comando global sigue en rojo por el resto de huecos ya documentados: RF-R1-06/17/19/20, RNF-R1-04/08, y el `Initial commit`)
+- [x] Commits con prefijo `[TASK-R1-012]`

@@ -89,6 +89,76 @@ def test_login_deshabilitado_devuelve_401_generico(client, make_user) -> None:
     assert response.json()["detail"] == "Usuario o contraseña incorrectos"
 
 
+@pytest.mark.spec("RF-R1-03")
+def test_login_con_sesion_real_registra_intentos_y_bloquea_pese_al_401() -> None:
+    """Regresión: con la fixture `client` (sesión de test reutilizada sin
+    cerrar) esto pasaba aunque el bloqueo estuviera roto, porque nada
+    forzaba un commit/rollback real entre peticiones. `app.db.session.get_db`
+    sí hace exactamente eso en producción: cada intento fallido levanta un
+    HTTPException(401), que FastAPI propaga a la dependencia `get_db` — y
+    su `except Exception: db.rollback()` deshacía el intento y el contador
+    de bloqueo que `authenticate()` acababa de registrar con solo
+    `flush()`, así que la cuenta nunca llegaba a bloquearse de verdad. Aquí
+    se ejercita la ruta real de principio a fin, sin overrides.
+    """
+    from fastapi.testclient import TestClient
+    from sqlalchemy import delete
+
+    from app.core.security import hash_password
+    from app.db.session import SessionLocal
+    from app.main import app
+    from app.models.account_lock import AccountLock
+    from app.models.login_attempt import LoginAttempt
+    from app.models.user import User
+
+    username = "gonzalo-lockout-real"
+    setup_db = SessionLocal()
+    try:
+        setup_db.add(User(username=username, password_hash=hash_password("S3gura!Larga")))
+        setup_db.commit()
+
+        client = TestClient(app, base_url="https://testserver")
+        try:
+            for _ in range(5):
+                client.post("/api/auth/login", json={"username": username, "password": "incorrecta"})
+
+            response = client.post(
+                "/api/auth/login", json={"username": username, "password": "S3gura!Larga"}
+            )
+
+            assert response.status_code == 401
+            assert "bloqueada" in response.json()["detail"]
+        finally:
+            client.close()
+    finally:
+        setup_db.execute(delete(LoginAttempt).where(LoginAttempt.username_claimed == username))
+        setup_db.execute(delete(AccountLock).where(AccountLock.username == username))
+        setup_db.execute(delete(User).where(User.username == username))
+        setup_db.commit()
+        setup_db.close()
+
+
+@pytest.mark.spec("RF-R1-03")
+def test_login_bloqueado_tras_5_fallos_informa_tiempo_restante_sin_revelar_usuario(
+    client, make_user
+) -> None:
+    make_user(username="gonzalo", password="S3gura!Larga")
+
+    for _ in range(5):
+        client.post("/api/auth/login", json={"username": "gonzalo", "password": "incorrecta"})
+
+    response = client.post(
+        "/api/auth/login", json={"username": "gonzalo", "password": "S3gura!Larga"}
+    )
+
+    assert response.status_code == 401
+    detail = response.json()["detail"]
+    assert "bloqueada temporalmente" in detail
+    assert "minutos" in detail
+    # El mensaje no debe mencionar el usuario ni distinguir "no existe".
+    assert "gonzalo" not in detail
+
+
 @pytest.mark.spec("RF-R1-02")
 def test_logout_revoca_la_sesion(client, make_user) -> None:
     make_user(username="gonzalo", password="una-contraseña-larga-123")

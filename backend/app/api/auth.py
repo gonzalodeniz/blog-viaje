@@ -1,5 +1,6 @@
-"""Implementa: RF-R1-01, RF-R1-02, RF-R1-04, RNF-R1-03."""
+"""Implementa: RF-R1-01, RF-R1-02, RF-R1-03, RF-R1-04, RNF-R1-03."""
 
+import math
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
@@ -53,11 +54,21 @@ def login(
     db: DbSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ) -> dict[str, str]:
-    user = authenticate(db, body.username, body.password)
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=GENERIC_LOGIN_ERROR)
+    client_ip = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+    result = authenticate(db, body.username, body.password, ip=client_ip, user_agent=user_agent)
 
-    created = create_session(db, user, settings, remember=body.remember, ip=request.client.host if request.client else None)
+    if result.locked_until is not None:
+        remaining_minutes = max(1, math.ceil((result.locked_until - datetime.now(timezone.utc)).total_seconds() / 60))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Cuenta bloqueada temporalmente. Inténtalo de nuevo en {remaining_minutes} minutos.",
+        )
+    if result.user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=GENERIC_LOGIN_ERROR)
+    user = result.user
+
+    created = create_session(db, user, settings, remember=body.remember, ip=client_ip)
     user.last_login_at = datetime.now(timezone.utc)
 
     ttl_seconds = int((created.session.expires_at - datetime.now(timezone.utc)).total_seconds())

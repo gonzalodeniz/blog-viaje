@@ -5,7 +5,11 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from sqlalchemy.exc import IntegrityError
 
+from sqlalchemy import select
+
 from app.core.config import Settings
+from app.models.account_lock import AccountLock
+from app.models.login_attempt import LoginAttempt, LoginAttemptResult
 from app.models.session import Session as SessionModel
 from app.models.user import User
 from app.services.auth import authenticate, create_session, resolve_session, revoke_session
@@ -23,27 +27,174 @@ def test_authenticate_con_credenciales_correctas(db_session, make_user) -> None:
 
     result = authenticate(db_session, "gonzalo", "una-contraseña-larga-123")
 
-    assert result is not None
-    assert result.id == user.id
+    assert result.user is not None
+    assert result.user.id == user.id
+    assert result.locked_until is None
 
 
 @pytest.mark.spec("RF-R1-04")
-def test_authenticate_con_password_incorrecta_devuelve_none(db_session, make_user) -> None:
+def test_authenticate_con_password_incorrecta_devuelve_usuario_none(db_session, make_user) -> None:
     make_user(username="gonzalo", password="una-contraseña-larga-123")
 
-    assert authenticate(db_session, "gonzalo", "password-equivocada") is None
+    result = authenticate(db_session, "gonzalo", "password-equivocada")
+
+    assert result.user is None
+    assert result.locked_until is None
 
 
 @pytest.mark.spec("RF-R1-04")
-def test_authenticate_con_usuario_inexistente_devuelve_none(db_session) -> None:
-    assert authenticate(db_session, "no-existe", "cualquier-cosa") is None
+def test_authenticate_con_usuario_inexistente_devuelve_usuario_none(db_session) -> None:
+    result = authenticate(db_session, "no-existe", "cualquier-cosa")
+
+    assert result.user is None
+    assert result.locked_until is None
 
 
 @pytest.mark.spec("RF-R1-04")
-def test_authenticate_con_cuenta_deshabilitada_devuelve_none(db_session, make_user) -> None:
+def test_authenticate_con_cuenta_deshabilitada_devuelve_usuario_none(db_session, make_user) -> None:
     make_user(username="gonzalo", password="una-contraseña-larga-123", disabled=True)
 
-    assert authenticate(db_session, "gonzalo", "una-contraseña-larga-123") is None
+    result = authenticate(db_session, "gonzalo", "una-contraseña-larga-123")
+
+    assert result.user is None
+
+
+@pytest.mark.spec("RF-R1-03")
+def test_authenticate_bloquea_tras_5_fallos_consecutivos(db_session, make_user) -> None:
+    make_user(username="gonzalo", password="S3gura!Larga")
+
+    for _ in range(5):
+        authenticate(db_session, "gonzalo", "incorrecta")
+
+    # El 6.º intento se bloquea aunque la contraseña sea correcta.
+    result = authenticate(db_session, "gonzalo", "S3gura!Larga")
+
+    assert result.user is None
+    assert result.locked_until is not None
+    remaining = (result.locked_until - datetime.now(timezone.utc)).total_seconds()
+    assert 14 * 60 < remaining <= 15 * 60
+
+
+@pytest.mark.spec("RF-R1-03")
+def test_authenticate_login_correcto_reinicia_el_contador(db_session, make_user) -> None:
+    make_user(username="gonzalo", password="S3gura!Larga")
+
+    for _ in range(4):
+        authenticate(db_session, "gonzalo", "incorrecta")
+    authenticate(db_session, "gonzalo", "S3gura!Larga")
+
+    # Tras el login correcto, 4 fallos más no deberían bloquear (el
+    # contador se reinició); hacen falta 5 fallos *después* del éxito.
+    for _ in range(4):
+        result = authenticate(db_session, "gonzalo", "incorrecta")
+
+    assert result.locked_until is None
+    assert db_session.scalar(select(AccountLock).where(AccountLock.username == "gonzalo")) is None
+
+
+@pytest.mark.spec("RF-R1-03")
+def test_authenticate_backoff_exponencial_en_segundo_bloqueo(db_session, make_user) -> None:
+    make_user(username="gonzalo", password="S3gura!Larga")
+
+    for _ in range(5):
+        authenticate(db_session, "gonzalo", "incorrecta")
+
+    lock = db_session.scalar(select(AccountLock).where(AccountLock.username == "gonzalo"))
+    assert lock.consecutive_locks == 1
+
+    # Simula que la ventana de bloqueo ya expiró (sin login correcto de por
+    # medio, así que el nivel de backoff no se reinicia) y se repite el
+    # patrón de 5 fallos.
+    lock.locked_until = datetime.now(timezone.utc) - timedelta(seconds=1)
+    db_session.flush()
+
+    for _ in range(5):
+        result = authenticate(db_session, "gonzalo", "incorrecta")
+
+    assert result.locked_until is not None
+    remaining = (result.locked_until - datetime.now(timezone.utc)).total_seconds()
+    assert 29 * 60 < remaining <= 30 * 60
+
+    db_session.refresh(lock)
+    assert lock.consecutive_locks == 2
+
+
+@pytest.mark.spec("RF-R1-03")
+def test_authenticate_login_correcto_borra_un_bloqueo_ya_expirado(db_session, make_user) -> None:
+    make_user(username="gonzalo", password="S3gura!Larga")
+    db_session.add(
+        AccountLock(
+            username="gonzalo",
+            locked_until=datetime.now(timezone.utc) - timedelta(seconds=1),
+            consecutive_locks=2,
+        )
+    )
+    db_session.flush()
+
+    result = authenticate(db_session, "gonzalo", "S3gura!Larga")
+
+    assert result.user is not None
+    assert db_session.scalar(select(AccountLock).where(AccountLock.username == "gonzalo")) is None
+
+
+@pytest.mark.spec("RF-R1-03")
+def test_authenticate_backoff_tiene_tope_de_60_minutos(db_session, make_user) -> None:
+    make_user(username="gonzalo", password="S3gura!Larga")
+    # 4 bloqueos previos ya acumulados (15 -> 30 -> 60 -> 60, el 4.º ya
+    # tocaría 120 sin el tope): el 5.º debe seguir capado a 60 min.
+    db_session.add(
+        AccountLock(
+            username="gonzalo",
+            locked_until=datetime.now(timezone.utc) - timedelta(seconds=1),
+            consecutive_locks=4,
+        )
+    )
+    db_session.flush()
+
+    for _ in range(5):
+        authenticate(db_session, "gonzalo", "incorrecta")
+    # El 5.º fallo dispara el bloqueo puertas adentro, pero (igual que en
+    # el escenario Gherkin de RF-R1-03) es el intento *siguiente* el que lo
+    # revela en el resultado.
+    result = authenticate(db_session, "gonzalo", "incorrecta")
+
+    remaining = (result.locked_until - datetime.now(timezone.utc)).total_seconds()
+    assert remaining <= 60 * 60 + 1
+
+
+@pytest.mark.spec("RF-R1-05")
+def test_authenticate_registra_todos_los_intentos_con_ip_y_user_agent(db_session, make_user) -> None:
+    # No se ordena por created_at: dentro de la misma transacción de test,
+    # func.now() en Postgres devuelve el mismo valor para todos los INSERT
+    # (es el timestamp de inicio de la transacción, no del statement), así
+    # que el orden de inserción no es reconstruible por esa columna aquí.
+    make_user(username="gonzalo", password="S3gura!Larga")
+
+    authenticate(db_session, "gonzalo", "incorrecta", ip="203.0.113.7", user_agent="pytest-agent")
+    authenticate(db_session, "gonzalo", "S3gura!Larga", ip="203.0.113.7", user_agent="pytest-agent")
+
+    attempts = db_session.scalars(
+        select(LoginAttempt).where(LoginAttempt.username_claimed == "gonzalo")
+    ).all()
+
+    assert sorted(a.result for a in attempts) == sorted([LoginAttemptResult.FAILURE, LoginAttemptResult.SUCCESS])
+    assert all(a.ip == "203.0.113.7" and a.user_agent == "pytest-agent" for a in attempts)
+
+
+@pytest.mark.spec("RF-R1-05")
+def test_authenticate_registra_intento_bloqueado_como_locked(db_session, make_user) -> None:
+    make_user(username="gonzalo", password="S3gura!Larga")
+    for _ in range(5):
+        authenticate(db_session, "gonzalo", "incorrecta")
+
+    authenticate(db_session, "gonzalo", "S3gura!Larga")
+
+    locked_attempts = db_session.scalars(
+        select(LoginAttempt).where(
+            LoginAttempt.username_claimed == "gonzalo", LoginAttempt.result == LoginAttemptResult.LOCKED
+        )
+    ).all()
+    assert len(locked_attempts) == 1
 
 
 @pytest.mark.spec("RF-R1-02")
