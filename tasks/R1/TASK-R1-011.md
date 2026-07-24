@@ -33,5 +33,9 @@
 - [x] Tests con `@pytest.mark.spec("...")` para cada comando (alta, rehabilitación, reset con contraseña de un solo uso, unlock idempotente, disable/enable, sessions-revoke, list-users, y que cada mutación deja fila en `audit_log` con `actor="cli"`) contra PostgreSQL real — 19 tests en `backend/tests/test_cli.py`, más los ya existentes de `test_auth_service.py`/`test_api_auth.py`
 - [x] Cobertura ≥ 80 % en el código tocado (`app/services/rescue_cli.py` 100 %, `app/cli/main.py` 98 %; suite completa 98.37 %)
 - [x] Revisión de seguridad: `bandit` sin hallazgos en los módulos nuevos; se verificó explícitamente que la contraseña temporal de `reset-password` no queda en `audit_log.detail` ni en ningún log
-- [ ] `python tools/traceability.py --check` en verde — **no**, pero no por esta tarea: quedan 9 errores preexistentes ajenos a WP-R1-3 (RF-R1-03/05/06/07/17/19/20, RNF-R1-04/08 sin test, y el commit `6624336` sin tarea), presentes ya antes de esta tarea. Esta tarea cierra los 5 que sí le correspondían (RF-R1-08 a RF-R1-12); los 9 restantes son deuda de WP-R1-2/WP-R1-5 (bloqueo real, frontend) y del `Initial commit`, fuera de alcance aquí.
+- [ ] `python tools/traceability.py --check` en verde — **no**, pero no por esta tarea: quedan 9 errores preexistentes ajenos a WP-R1-3, presentes ya antes de esta tarea (confirmado con `git stash` sobre el estado base). Esta tarea cierra los 5 requisitos que le correspondían (RF-R1-08 a RF-R1-12). Los 9 restantes:
+  - RF-R1-03, RF-R1-05, RF-R1-06, RF-R1-07, RF-R1-20, RNF-R1-08 (WP-R1-2): bloqueo real, registro de intentos, roles/autorización, cambio forzado de contraseña — funcionalidad todavía no implementada.
+  - RF-R1-17, RF-R1-19 (WP-R1-5): editor/UI de administración — todavía no implementados (no existe frontend real, solo el esqueleto Vite).
+  - RNF-R1-04 (WP-R1-1): TLS/cabeceras nginx — **sí está implementado** (TASK-R1-003/004), solo le falta un test con `@pytest.mark.spec("RNF-R1-04")`; es deuda de test, no de funcionalidad.
+  - El commit `6624336 Initial commit`, sin prefijo de tarea ni `[SDD]`.
 - [x] Commits con prefijo `[TASK-R1-011]`
