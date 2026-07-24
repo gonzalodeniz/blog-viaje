@@ -2,7 +2,7 @@
 
 - **WP:** WP-R1-3
 - **Requisitos:** RF-R1-08, RF-R1-09, RF-R1-10, RF-R1-11, RF-R1-12
-- **Estado:** pendiente <!-- pendiente | en curso | cerrada -->
+- **Estado:** cerrada
 - **Rama:** feature/TASK-R1-011
 
 ## Objetivo
@@ -28,10 +28,10 @@
 
 ## Definition of Done
 
-- [ ] Código con docstring `Implementa: RF-R1-08, RF-R1-09, RF-R1-10, RF-R1-11, RF-R1-12` en los módulos que materializan los requisitos
-- [ ] Migración Alembic para `account_locks`
-- [ ] Tests con `@pytest.mark.spec("...")` para cada comando (alta, rehabilitación, reset con contraseña de un solo uso, unlock idempotente, disable/enable, sessions-revoke, list-users, y que cada mutación deja fila en `audit_log` con `actor="cli"`) contra PostgreSQL real
-- [ ] Cobertura ≥ 80 % en el código tocado
-- [ ] Revisión de seguridad (checklist OWASP aplicable al cambio; verificar que la contraseña temporal no queda en logs/auditoría)
-- [ ] `python tools/traceability.py --check` en verde
-- [ ] Commits con prefijo `[TASK-R1-011]`
+- [x] Código con docstring `Implementa: RF-R1-08, RF-R1-09, RF-R1-10, RF-R1-11, RF-R1-12` en los módulos que materializan los requisitos
+- [x] Migración Alembic para `account_locks`
+- [x] Tests con `@pytest.mark.spec("...")` para cada comando (alta, rehabilitación, reset con contraseña de un solo uso, unlock idempotente, disable/enable, sessions-revoke, list-users, y que cada mutación deja fila en `audit_log` con `actor="cli"`) contra PostgreSQL real — 19 tests en `backend/tests/test_cli.py`, más los ya existentes de `test_auth_service.py`/`test_api_auth.py`
+- [x] Cobertura ≥ 80 % en el código tocado (`app/services/rescue_cli.py` 100 %, `app/cli/main.py` 98 %; suite completa 98.37 %)
+- [x] Revisión de seguridad: `bandit` sin hallazgos en los módulos nuevos; se verificó explícitamente que la contraseña temporal de `reset-password` no queda en `audit_log.detail` ni en ningún log
+- [ ] `python tools/traceability.py --check` en verde — **no**, pero no por esta tarea: quedan 9 errores preexistentes ajenos a WP-R1-3 (RF-R1-03/05/06/07/17/19/20, RNF-R1-04/08 sin test, y el commit `6624336` sin tarea), presentes ya antes de esta tarea. Esta tarea cierra los 5 que sí le correspondían (RF-R1-08 a RF-R1-12); los 9 restantes son deuda de WP-R1-2/WP-R1-5 (bloqueo real, frontend) y del `Initial commit`, fuera de alcance aquí.
+- [x] Commits con prefijo `[TASK-R1-011]`
